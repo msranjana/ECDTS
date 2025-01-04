@@ -32,7 +32,7 @@ async function loginUser(username, password) {
         // If user not found, log and return a structured response
         if (!user) {
             console.warn(`Login attempt failed: User ${username} not found.`);
-            return { success: false, message: 'user not found ic 2' };
+            return { success: false, message: 'User not found' };
         }
 
         // Compare the provided password with the stored hashed password
@@ -41,7 +41,7 @@ async function loginUser(username, password) {
         // If password does not match, log and return a structured response
         if (!isPasswordCorrect) {
             console.warn(`Login attempt failed: Incorrect password for user ${username}.`);
-            return { success: false, message: 'Invalid credentials u got' };
+            return { success: false, message: 'Invalid credentials' };
         }
 
         // If login is successful, return user details

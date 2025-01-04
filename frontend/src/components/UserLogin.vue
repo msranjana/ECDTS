@@ -27,7 +27,7 @@
           <v-card-actions>
             <v-btn color="primary" @click="login">Login</v-btn>
             <v-spacer></v-spacer>
-            <v-btn text @click="$emit('switch-to-signup')">Don't have an account? Sign Up</v-btn>
+            <v-btn text @click="switchToSignUp">Don't have an account? Sign Up</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -41,7 +41,7 @@ import { useRouter } from 'vue-router';
 import { apiService } from '../services/apiService';
 
 // Setup reactive variables
-const router = useRouter(); // Uncommented to use router
+const router = useRouter();
 const valid = ref(false);
 const username = ref('');
 const password = ref('');
@@ -72,32 +72,21 @@ async function login() {
       console.log('Logged in username:', loggedInUsername); // For debugging
       console.log('User role:', role);
 
-      errorMessage.value = 'success';
+      errorMessage.value = '';
 
       // Display the success message (pop-up)
       alert('Login successful!');
 
       // Redirect based on user role
-      // if (role === 'admin') {
-      //   console.log("Redirecting to admin-dashboard");
-      //   await router.push('http://localhost:8082/admin-dashboard'); // Redirect to the admin dashboard
-      // } else if (role === 'parent') {
-      //   console.log("Redirecting to children-management");
-      //   await router.push('http://localhost:8082/parent-dashboard');
-      // } else {
-      //   await router.push('/user-dashboard'); // Fallback for other roles
-      // }
       if (role === 'admin') {
-  console.log("Redirecting to admin-dashboard");
-  await router.push({ name: 'admin-dashboard' }); // Use the named route
-} else if (role === 'parent') {
-  console.log("Redirecting to children-management");
-  await router.push({ name: 'children-management' }); // Use the named route
-} else {
-  await router.push('/user-dashboard'); // Use relative path as fallback
-}
-
-      
+        console.log("Redirecting to admin-dashboard");
+        await router.push({ name: 'admin-dashboard' }); // Use the named route
+      } else if (role === 'parent') {
+        console.log("Redirecting to parent-dashboard");
+        await router.push({ name: 'parent-dashboard' }); // Use the named route
+      } else {
+        await router.push('/user-dashboard'); // Use relative path as fallback
+      }
     } else {
       errorMessage.value = response.data.error || 'Invalid credentials.';
     }
@@ -115,6 +104,10 @@ async function login() {
     }
   }
 }
+
+const switchToSignUp = () => {
+  router.push({ name: 'signup' });
+};
 
 </script>
 

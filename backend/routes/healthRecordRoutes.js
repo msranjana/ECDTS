@@ -1,20 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const healthRecordController = require('../controllers/healthRecordController');
+const {
+    createHealthRecord,
+    getAllHealthRecords,
+    getHealthRecordById,
+    updateHealthRecord,
+    deleteHealthRecord
+} = require('../controllers/healthRecordController');
 
 // Create a new health record
-router.post('/', healthRecordController.createHealthRecord);
+router.post('/', createHealthRecord);
 
 // Get all health records
-router.get('/all', healthRecordController.getAllHealthRecords);
+router.get('/', getAllHealthRecords);
 
 // Get a health record by ID
-router.get('/:health_id', healthRecordController.getHealthRecordById);
+router.get('/:health_id', getHealthRecordById);
 
-// Update a health record
-router.put('/:health_id', healthRecordController.updateHealthRecord);
+// Update a health record by ID
+router.put('/:hr_id', updateHealthRecord);
 
-// Delete a health record
-router.delete('/:health_id', healthRecordController.deleteHealthRecord);
+// Delete a health record by ID
+router.delete('/:hr_id', deleteHealthRecord);
 
 module.exports = router;

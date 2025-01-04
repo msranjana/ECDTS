@@ -1,6 +1,7 @@
 <template>
   <div class="view-children">
-    <h2>All Children Records</h2>
+    <button class="back-to-dashboard" @click="goToDashboard">Back to Dashboard</button>
+    <h2>Manage Children Records</h2>
 
     <!-- Form to add or update a child -->
     <form @submit.prevent="editingChild ? updateChild() : addChild()">
@@ -56,9 +57,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
-// Create a reactive reference for children data
-const children = ref([]); // Initialize as an empty array
+const children = ref([]);
 const newChild = ref({
   child_name: '',
   dob: '',
@@ -69,42 +70,39 @@ const newChild = ref({
   address: ''
 });
 const editingChild = ref(null);
+const router = useRouter();
 
-// Fetch children data when the component is mounted
 const fetchChildren = async () => {
   try {
     const response = await axios.get('http://localhost:5000/api/children/all');
-    children.value = response.data || []; // Ensure response data is an array
+    children.value = response.data || [];
   } catch (error) {
     console.error('Error fetching children data:', error);
-    children.value = []; // Set to empty array on error
+    children.value = [];
   }
 };
 
-// Add a new child
 const addChild = async () => {
   try {
     const response = await axios.post('http://localhost:5000/api/children', newChild.value);
     console.log('Child added:', response.data);
-    fetchChildren(); // Refresh the list
+    fetchChildren();
     clearForm();
   } catch (error) {
     console.error('Error adding child:', error);
   }
 };
 
-// Edit a child
 const editChild = (child) => {
   editingChild.value = { ...child };
   Object.assign(newChild.value, child);
 };
 
-// Update a child
 const updateChild = async () => {
   try {
     const response = await axios.put(`http://localhost:5000/api/children/${editingChild.value.child_id}`, newChild.value);
     console.log('Child updated:', response.data);
-    fetchChildren(); // Refresh the list
+    fetchChildren();
     clearForm();
     editingChild.value = null;
   } catch (error) {
@@ -112,18 +110,16 @@ const updateChild = async () => {
   }
 };
 
-// Delete a child
 const deleteChild = async (childID) => {
   try {
     const response = await axios.delete(`http://localhost:5000/api/children/${childID}`);
     console.log('Child deleted:', response.data);
-    fetchChildren(); // Refresh the list
+    fetchChildren();
   } catch (error) {
     console.error('Error deleting child:', error);
   }
 };
 
-// Calculate age based on date of birth
 const calculateAge = () => {
   const dob = new Date(newChild.value.dob);
   const ageDifMs = Date.now() - dob.getTime();
@@ -131,7 +127,6 @@ const calculateAge = () => {
   newChild.value.age = Math.abs(ageDate.getUTCFullYear() - 1970);
 };
 
-// Clear the form
 const clearForm = () => {
   newChild.value = {
     child_name: '',
@@ -144,25 +139,44 @@ const clearForm = () => {
   };
 };
 
-onMounted(() => {
-  fetchChildren();
-});
+const goToDashboard = () => {
+  router.push('/admin-dashboard');
+};
+
+onMounted(fetchChildren);
 </script>
 
 <style scoped>
 .view-children {
   margin: 20px auto;
   max-width: 1200px;
-  background: #fff;
+  background: #f9f9f9; /* Updated color */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.back-to-dashboard {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #007bff; /* Updated color */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-to-dashboard:hover {
+  background-color: #0056b3; /* Updated color */
 }
 
 h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #4a90e2;
+  color: #26a69a;
 }
 
 form {
@@ -181,7 +195,7 @@ form input {
 
 form button {
   padding: 10px 20px;
-  background-color: #4a90e2;
+  background-color: #2aa626;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -189,7 +203,7 @@ form button {
 }
 
 form button:hover {
-  background-color: #357ab8;
+  background-color: #24c92c;
 }
 
 .children-table {
@@ -205,7 +219,7 @@ form button:hover {
 }
 
 .children-table th {
-  background-color: #4a90e2;
+  background-color: #343a40; /* Updated color */
   color: #fff;
   font-weight: bold;
 }
@@ -229,7 +243,7 @@ button {
 }
 
 button:hover {
-  background-color: #357ab8;
+  background-color: #ffc107; /* Updated color */
   color: #fff;
 }
 </style>

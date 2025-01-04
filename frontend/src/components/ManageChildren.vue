@@ -1,29 +1,52 @@
 <template>
   <div class="manage-children">
-    <h2>Manage Children</h2>
-    <form @submit.prevent="editingChild ? updateChild() : addChild()">
-      <input v-model="childName" placeholder="Child Name" required />
-      <input type="date" v-model="dob" @change="calculateAge" placeholder="Date of Birth" required />
-      <input type="number" v-model="age" placeholder="Age" required readonly />
-      <select v-model="gender">
-        <option value="">Select Gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-      <!-- Removed fields for caretaker details -->
-      <button type="submit">{{ editingChild ? 'Update Child' : 'Add Child' }}</button>
-    </form>
+    <!-- Header Section -->
+    <header class="dashboard-header">
+      <div class="header-container">
+        <h1>EarlyCare</h1>
+        <div class="profile-menu">
+          <button class="profile-button">Admin ▼</button>
+          <ul class="dropdown-menu">
+            <li><a href="#profile">Profile</a></li>
+            <li><a href="#logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
 
-    <!-- List of children -->
-    <ul v-if="children.length > 0">
-      <li v-for="child in children" :key="child.child_id">
-        {{ child.child_name }}
-        <button @click="editChild(child)">Edit</button>
-        <button @click="deleteChild(child.child_id)">Delete</button>
-      </li>
-    </ul>
-    <p v-else>No children available.</p> <!-- Display message when no children are available -->
+    <!-- Main Content Area -->
+    <main class="dashboard-content">
+      <button class="back-to-dashboard" @click="goToDashboard">Back to Dashboard</button> <!-- Add this line -->
+      <h2>Manage Children Record</h2>
+      <form @submit.prevent="editingChild ? updateChild() : addChild()">
+        <input v-model="childName" placeholder="Child Name" required />
+        <input type="date" v-model="dob" @change="calculateAge" placeholder="Date of Birth" required />
+        <input type="number" v-model="age" placeholder="Age" required readonly />
+        <select v-model="gender">
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <!-- Removed fields for caretaker details -->
+        <button type="submit">{{ editingChild ? 'Update Child' : 'Add Child' }}</button>
+      </form>
+
+      <!-- List of children -->
+      <ul v-if="children.length > 0">
+        <li v-for="child in children" :key="child.child_id">
+          {{ child.child_name }}
+          <button @click="editChild(child)">Edit</button>
+          <button @click="deleteChild(child.child_id)">Delete</button>
+        </li>
+      </ul>
+      <p v-else>No children available.</p> <!-- Display message when no children are available -->
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="dashboard-footer">
+      <p>&copy; 2025 EarlyCare. All rights reserved.</p>
+    </footer>
   </div>
 </template>
 
@@ -125,16 +148,128 @@ function clearForm() {
 
 // Fetch children when component mounts.
 fetchChildren();
+
+const goToDashboard = () => {
+  window.location.href = '/admin-dashboard'; // Add this function
+};
 </script>
 
 <style scoped>
+/* General Layout */
 .manage-children {
-  margin: 20px auto;
-  max-width: 1200px;
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: #f4f7f9;
+}
+
+/* Header Styling */
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #26a69a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.profile-menu {
+  position: relative;
+}
+
+.profile-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 10px;
+  display: none;
+}
+
+.profile-menu:hover .dropdown-menu {
+  display: block;
+}
+
+/* Main Content Styling */
+.dashboard-content {
+  margin-top: 80px; /* Space for the header */
   padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-content > * {
+  margin-bottom: 20px;
+}
+
+/* Footer Styling */
+.dashboard-footer {
+  position: fixed; /* Make the footer fixed */
+  bottom: 0;       /* Stick to the bottom */
+  left: 0;         /* Align with the viewport's left */
+  width: 100%;     /* Stretch across the entire width */
+  background-color: #26a69a;
+  color: #fff;
+  text-align: center;
+  padding: 10px 20px; /* Add some padding for better spacing */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
+  z-index: 1000; /* Ensure it stays above other elements */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-content {
+    width: 100%;
+  }
+
+  .dashboard-footer {
+    width: 100%;
+  }
+}
+
+.back-to-dashboard {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #007bff; /* Updated color */
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-to-dashboard:hover {
+  background-color: #0056b3; /* Updated color */
 }
 
 h2 {
@@ -154,13 +289,13 @@ form input,
 form select {
   flex: 1;
   padding: 10px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #ced4da; /* Updated color */
   border-radius: 5px;
 }
 
 form button {
   padding: 10px 20px;
-  background-color: #26a69a;
+  background-color: #28a745; /* Updated color */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -168,7 +303,7 @@ form button {
 }
 
 form button:hover {
-  background-color: #00796b;
+  background-color: #218838; /* Updated color */
 }
 
 ul {

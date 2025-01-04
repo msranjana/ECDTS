@@ -1,5 +1,5 @@
 <template>
-  <div class="manage-vaccines">
+  <div class="manage-vaccine-records">
     <!-- Header Section -->
     <header class="dashboard-header">
       <div class="header-container">
@@ -12,40 +12,46 @@
 
     <!-- Main Content Area -->
     <main class="dashboard-content">
-      <h2><strong>Manage Vaccine Details</strong></h2>
+      <h2><strong>Manage Vaccine Records</strong></h2>
 
-      <!-- Form to add or update a vaccine -->
-      <form @submit.prevent="editingVaccine ? updateVaccine() : addVaccine()">
-        <input v-model="newVaccine.v_name" placeholder="Vaccine Name" required />
-        <input v-model="newVaccine.v_type" placeholder="Vaccine Type" required />
-        <input v-model="newVaccine.mfg_company" placeholder="Manufacturer Company" required />
-        <button type="submit">{{ editingVaccine ? 'Update Vaccine' : 'Add Vaccine' }}</button>
+      <!-- Form to add or update a vaccine record -->
+      <form @submit.prevent="editingRecord ? updateVaccineRecord() : addVaccineRecord()">
+        <input v-model="newRecord.v_id" placeholder="Vaccine ID" required />
+        <input v-model="newRecord.child_id" placeholder="Child ID" required />
+        <input v-model="newRecord.administered_date" type="date" placeholder="Administered Date" required />
+        <input v-model="newRecord.next_due_date" type="date" placeholder="Next Due Date" required />
+        <!-- Status field is read-only and automatically managed by the backend -->
+        <input v-model="newRecord.status" placeholder="Status" readonly />
+        <button type="submit">{{ editingRecord ? 'Update Record' : 'Add Record' }}</button>
       </form>
 
-      <!-- Display the data in a table -->
-      <table class="vaccines-table">
+      <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Manufacturer</th>
+            <th>Record ID</th>
+            <th>Vaccine ID</th>
+            <th>Child ID</th>
+            <th>Administered Date</th>
+            <th>Next Due Date</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="vaccine in vaccines" :key="vaccine.v_id">
-            <td>{{ vaccine.v_id }}</td>
-            <td>{{ vaccine.v_name }}</td>
-            <td>{{ vaccine.v_type }}</td>
-            <td>{{ vaccine.mfg_company }}</td>
+          <tr v-for="record in vaccineRecords" :key="record.vrec_id">
+            <td>{{ record.vrec_id }}</td>
+            <td>{{ record.v_id }}</td>
+            <td>{{ record.child_id }}</td>
+            <td>{{ record.administered_date }}</td>
+            <td>{{ record.next_due_date }}</td>
+            <td>{{ record.status }}</td>
             <td>
-              <button @click="editVaccine(vaccine)">Edit</button>
-              <button @click="deleteVaccine(vaccine.v_id)">Delete</button>
+              <button @click="editVaccineRecord(record)">Edit</button>
+              <button @click="deleteVaccineRecord(record.vrec_id)">Delete</button>
             </td>
           </tr>
-          <tr v-if="vaccines && vaccines.length === 0">
-            <td colspan="5" class="no-data">No data available</td>
+          <tr v-if="vaccineRecords.length === 0">
+            <td colspan="7" class="no-data">No data available</td>
           </tr>
         </tbody>
       </table>
@@ -58,94 +64,88 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
+<script>
 import axios from 'axios';
-import { useRouter } from 'vue-router';
 
-// Create a reactive reference for vaccines data
-const vaccines = ref([]); // Initialize as an empty array
-const newVaccine = ref({
-  v_name: '',
-  v_type: '',
-  mfg_company: ''
-});
-const editingVaccine = ref(null);
-const router = useRouter();
-
-// Fetch vaccines data when the component is mounted
-const fetchVaccines = async () => {
-  try {
-    const response = await axios.get('http://localhost:5000/api/vaccine/all');
-    vaccines.value = response.data || []; // Ensure response data is an array
-  } catch (error) {
-    console.error('Error fetching vaccines data:', error);
-    vaccines.value = []; // Set to empty array on error
+export default {
+  name: 'ManageVaccineRecords',
+  data() {
+    return {
+      vaccineRecords: [],
+      newRecord: {
+        v_id: '',
+        child_id: '',
+        administered_date: '',
+        next_due_date: '',
+        status: '' // Add status field
+      },
+      editingRecord: null
+    };
+  },
+  methods: {
+    async fetchVaccineRecords() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/vaccine-records');
+        this.vaccineRecords = response.data;
+      } catch (error) {
+        console.error('Error fetching vaccine records:', error);
+      }
+    },
+    async addVaccineRecord() {
+      try {
+        const response = await axios.post('http://localhost:5000/api/vaccine-records', this.newRecord);
+        console.log('Vaccine record added:', response.data);
+        this.fetchVaccineRecords();
+        this.clearForm();
+      } catch (error) {
+        console.error('Error adding vaccine record:', error);
+      }
+    },
+    editVaccineRecord(record) {
+      this.editingRecord = { ...record };
+      Object.assign(this.newRecord, record);
+    },
+    async updateVaccineRecord() {
+      try {
+        const response = await axios.put(`http://localhost:5000/api/vaccine-records/${this.editingRecord.vrec_id}`, this.newRecord);
+        console.log('Vaccine record updated:', response.data);
+        this.fetchVaccineRecords();
+        this.clearForm();
+        this.editingRecord = null;
+      } catch (error) {
+        console.error('Error updating vaccine record:', error);
+      }
+    },
+    async deleteVaccineRecord(vrec_id) {
+      try {
+        const response = await axios.delete(`http://localhost:5000/api/vaccine-records/${vrec_id}`);
+        console.log('Vaccine record deleted:', response.data);
+        this.fetchVaccineRecords();
+      } catch (error) {
+        console.error('Error deleting vaccine record:', error);
+      }
+    },
+    clearForm() {
+      this.newRecord = {
+        v_id: '',
+        child_id: '',
+        administered_date: '',
+        next_due_date: '',
+        status: '' // Clear status field
+      };
+    },
+    goToDashboard() {
+      this.$router.push('/admin-dashboard');
+    }
+  },
+  mounted() {
+    this.fetchVaccineRecords();
   }
 };
-
-// Add a new vaccine
-const addVaccine = async () => {
-  try {
-    const response = await axios.post('http://localhost:5000/api/vaccine', newVaccine.value);
-    console.log('Vaccine added:', response.data);
-    fetchVaccines(); // Refresh the list
-    clearForm();
-  } catch (error) {
-    console.error('Error adding vaccine:', error);
-  }
-};
-
-// Edit a vaccine
-const editVaccine = (vaccine) => {
-  editingVaccine.value = { ...vaccine };
-  Object.assign(newVaccine.value, vaccine);
-};
-
-// Update a vaccine
-const updateVaccine = async () => {
-  try {
-    const response = await axios.put(`http://localhost:5000/api/vaccine/${editingVaccine.value.v_id}`, newVaccine.value);
-    console.log('Vaccine updated:', response.data);
-    fetchVaccines(); // Refresh the list
-    clearForm();
-    editingVaccine.value = null;
-  } catch (error) {
-    console.error('Error updating vaccine:', error);
-  }
-};
-
-// Delete a vaccine
-const deleteVaccine = async (vaccineID) => {
-  try {
-    const response = await axios.delete(`http://localhost:5000/api/vaccine/${vaccineID}`);
-    console.log('Vaccine deleted:', response.data);
-    fetchVaccines(); // Refresh the list
-  } catch (error) {
-    console.error('Error deleting vaccine:', error);
-  }
-};
-
-// Clear the form
-const clearForm = () => {
-  newVaccine.value = {
-    v_name: '',
-    v_type: '',
-    mfg_company: ''
-  };
-};
-
-const goToDashboard = () => {
-  router.push('/admin-dashboard');
-};
-
-onMounted(() => {
-  fetchVaccines();
-});
 </script>
 
 <style scoped>
-.manage-vaccines {
+.manage-vaccine-records {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -296,25 +296,24 @@ form button:hover {
   background-color: #218838; /* Updated color */
 }
 
-.vaccines-table {
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.vaccines-table th,
-.vaccines-table td {
+th, td {
   border: 1px solid #dee2e6;
   padding: 10px;
   text-align: left;
 }
 
-.vaccines-table th {
+th {
   background-color: #343a40; /* Updated color */
   color: #fff;
   font-weight: bold;
 }
 
-.vaccines-table tr:nth-child(even) {
+tr:nth-child(even) {
   background-color: #f8f9fa;
 }
 

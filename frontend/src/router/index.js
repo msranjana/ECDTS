@@ -11,13 +11,19 @@ import ViewAllCaretakers from '../components/ViewAllCaretakers.vue';
 import ViewAllHospitals from '../components/ViewAllHospitals.vue';
 import ManagePhysicalRecords from '../components/ManagePhysicalRecords.vue';
 import ManageHealthRecords from '../components/ManageHealthRecords.vue';
+import ManageVaccineRecords from '../components/VaccineRecords.vue';
 
 const routes = [
     { path: '/', component: UserLogin, name: 'login' },
     {
+        path: '/login',
+        name: 'login',
+        component: UserLogin,
+    },
+    {
         path: '/signup',
-        name: 'SignUp',
-        component: SignUp
+        name: 'signup',
+        component: SignUp,
     },
     {
         path: '/admin-dashboard',
@@ -26,7 +32,8 @@ const routes = [
         children: [
           {
             path: 'manage-vaccines',
-            component: ManageVaccines,
+            name: 'ManageVaccines',
+            component: ManageVaccines
           },
           {
             path: 'manage-children',
@@ -99,10 +106,21 @@ const routes = [
       name: 'manage-health-records',
       component: ManageHealthRecords
   },
+  {
+      path: '/admin/manage-vaccine-records',
+      name: 'ManageVaccineRecords',
+      component: ManageVaccineRecords
+  },
+  
+  {
+      path: '/parent-dashboard',
+      name: 'ParentDashboard',
+      component: ParentDashboard,
+  }
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHistory(process.env.BASE_URL),
     routes
 });
 

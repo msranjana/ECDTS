@@ -14,9 +14,9 @@ router.post('/', createCaretaker);
 router.get('/', getAllCaretakers);
 
 // Update a caretaker by ID
-router.put('/:caretakerID', updateCaretaker);
+router.put('/:ct_id', updateCaretaker);
 
 // Delete a caretaker by ID
-router.delete('/:caretakerID', deleteCaretaker);
+router.delete('/:ct_id', deleteCaretaker);
 
 module.exports = router;

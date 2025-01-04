@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const db = require('./config/db.config'); // Adjusted path
 const userRoutes = require('./routes/userRoutes'); 
 const childrenRoutes = require('./routes/childrenRoutes'); 
 const vaccineRoutes = require('./routes/vaccineRoutes'); 
@@ -28,6 +29,7 @@ app.use('/api/health-records', healthRecordRoutes);
 app.use('/api/caretakers', caretakerRoutes); 
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/vaccine-records', vaccineRecordRoutes); // Use the new routes
+
 
 // Handle 404 errors
 app.use((req, res, next) => {
