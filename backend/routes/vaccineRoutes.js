@@ -1,22 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const {
-    createVaccine,
-    getAllVaccines,
-    updateVaccine,
-    deleteVaccine
-} = require('../controllers/vaccineController');
+const vaccineController = require('../controllers/vaccineController');
 
 // Create a new vaccine record
-router.post('/', createVaccine);
+router.post('/', vaccineController.addVaccine);
 
 // Get all vaccines records
-router.get('/', getAllVaccines);
+router.get('/all', vaccineController.getAllVaccines);
 
 // Update a vaccine record
-router.put('/:v_id', updateVaccine);
+router.put('/:id', vaccineController.updateVaccine);
 
 // Delete a vaccine record
-router.delete('/:v_id', deleteVaccine);
+router.delete('/:id', vaccineController.deleteVaccine);
 
 module.exports = router;

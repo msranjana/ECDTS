@@ -1,78 +1,71 @@
-const pool=require('../config/db.config');
+const pool = require('../config/db.config');
 
 // Create a new caretaker
-const createCaretaker=async(req,res)=>{
-     // Destructure fields from request body.
-     const{ct_name ,role ,gender ,ct_contact ,qualification,hospital_id}=req.body;
+const createCaretaker = async (req, res) => {
+    const { ct_name, ct_contact, gender, hospital_id, qualification, role } = req.body;
 
-     try{
-         // Insert into caretaker table.
-         const[result]=await pool.execute(
-             'INSERT INTO care_taker(ct_name ,role ,gender ,ct_contact ,qualification,hospital_id ) VALUES (?, ?, ?, ?,?,?)',
-             [ct_name ,role ,gender ,ct_contact ,qualification,hospital_id]
-         );
-
-         // Respond with success message.
-         return(res.status(201)).send(`Caretaker ${ct_name} added successfully.`);
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+    try {
+        const [result] = await pool.query(
+            "INSERT INTO care_taker (ct_name, ct_contact, gender, hospital_id, qualification, role) VALUES (?, ?, ?, ?, ?, ?)",
+            [ct_name, ct_contact, gender, hospital_id, qualification, role]
+        );
+        return res.send(`Caretaker ${ct_name} added successfully.`);
+    } catch (err) {
+        console.error(err);
+        return res.sendStatus(500);
+    }
 };
 
 // Get all caretakers
-const getAllCaretakers=async(req,res)=>{
-     try{
-         // Execute query to fetch all caretakers.
-         let[rows]=await pool.query("SELECT * FROM care_taker");
-         return(res.json(rows)); // Return fetched rows as JSON response.
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+const getAllCaretakers = async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM care_taker");
+        if (rows.length === 0) return res.status(404).json({ message: 'No caretakers found' });
+        return res.json(rows);
+    } catch (err) {
+        console.error(err);
+        return res.sendStatus(500);
+    }
 };
 
-// Update a caretaker's details
-const updateCaretaker=async(req,res)=>{
-     // Destructure caretaker ID from request parameters and other fields from body.
-     let{ct_name}=req.body;
-     let{ctid}=req.params;
+// Update caretaker details by ID
+const updateCaretaker = async (req, res) => {
+    const { ct_name, ct_contact, gender, hospital_id, qualification, role } = req.body;
+    const { caretakerID } = req.params;
 
-     try{
-         // Execute query to update caretaker details.
-         let[result]=await pool.query("UPDATE care_taker SET ct_name=? WHERE ctID=?", 
-             [ct_name], 
-             [ctid]
-         );
-
-         // Check if any row was affected; respond accordingly.
-         if(result.affectedRows===0)
-             return(res.sendStatus(404)); // Not found status.
-         
-         return(res.send(`Caretaker ${ctid} updated successfully.`)); // Success message.
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+    try {
+        const [result] = await pool.query(
+            "UPDATE care_taker SET ct_name = ?, ct_contact = ?, gender = ?, hospital_id = ?, qualification = ?, role = ? WHERE ct_id = ?",
+            [ct_name, ct_contact, gender, hospital_id, qualification, role, caretakerID]
+        );
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.send(`Caretaker ${caretakerID} updated successfully.`);
+    } catch (err) {
+        console.error(err);
+        return res.sendStatus(500);
+    }
 };
 
-// Delete a caretaker's details
-const deleteCaretaker=async(req,res)=>{
-     let{ctid}=req.params; // Extract caretaker ID from parameters.
+// Delete caretaker by ID
+const deleteCaretaker = async (req, res) => {
+    const { caretakerID } = req.params;
 
-     try{
-         let[result]=await pool.query("DELETE FROM care_taker WHERE ctID=?", 
-             ctid 
-         );
-
-         if(result.affectedRows===0)
-             return(res.sendStatus(404)); // Not found status.
-
-         return(res.send(`Caretaker ${ctid} deleted successfully.`)); // Success message.
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+    try {
+        const [result] = await pool.query(
+            "DELETE FROM care_taker WHERE ct_id = ?",
+            [caretakerID]
+        );
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.send(`Caretaker ${caretakerID} deleted successfully.`);
+    } catch (err) {
+        console.error(err);
+        return res.sendStatus(500);
+    }
 };
 
-module.exports={createCaretaker,getAllCaretakers ,updateCaretaker ,deleteCaretaker};
+module.exports = {
+    createCaretaker,
+    getAllCaretakers,
+    updateCaretaker,
+    deleteCaretaker
+};

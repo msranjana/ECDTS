@@ -1,4 +1,3 @@
-// backend/routes/userRoutes.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -17,7 +16,7 @@ router.post('/signup', async (req, res) => {
         }
 
         const result = await registerUser(username, password, role);
-        console.log('User Object from loginUser:', user);
+        console.log('User Object from registerUser:', result);
 
         
         if (!result.success) {

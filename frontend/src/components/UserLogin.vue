@@ -64,7 +64,7 @@ async function login() {
       const { id, username: loggedInUsername, role } = response.data; // Extract necessary values
       console.log("User Role:", role); // Log the role
 
-      // Save token and user data
+      // Save token and user data in localStorage
       localStorage.setItem('id', id);
       localStorage.setItem('username', loggedInUsername);
       localStorage.setItem('role', role);
@@ -74,25 +74,48 @@ async function login() {
 
       errorMessage.value = 'success';
 
+      // Display the success message (pop-up)
+      alert('Login successful!');
+
       // Redirect based on user role
+      // if (role === 'admin') {
+      //   console.log("Redirecting to admin-dashboard");
+      //   await router.push('http://localhost:8082/admin-dashboard'); // Redirect to the admin dashboard
+      // } else if (role === 'parent') {
+      //   console.log("Redirecting to children-management");
+      //   await router.push('http://localhost:8082/parent-dashboard');
+      // } else {
+      //   await router.push('/user-dashboard'); // Fallback for other roles
+      // }
       if (role === 'admin') {
-        console.log("Redirecting to admin-dashboard");
-        await router.push({ name: 'admin-dashboard' });
-      } else if (role === 'parent') {
-        console.log("Redirecting to children-management");
-        await router.push({ name: 'children-management' });
-      } else {
-        await router.push('/user-dashboard'); // Fallback for other roles
-      }
+  console.log("Redirecting to admin-dashboard");
+  await router.push({ name: 'admin-dashboard' }); // Use the named route
+} else if (role === 'parent') {
+  console.log("Redirecting to children-management");
+  await router.push({ name: 'children-management' }); // Use the named route
+} else {
+  await router.push('/user-dashboard'); // Use relative path as fallback
+}
+
       
     } else {
       errorMessage.value = response.data.error || 'Invalid credentials.';
     }
   } catch (error) {
-    errorMessage.value =
-      error.response?.data?.error || 'Unable to login. Please try again later.';
+    console.error('Error occurred during login:', error); // Log the error
+
+    // Check if the error contains a response object, and log it
+    if (error.response) {
+      console.error('Error Response:', error.response);
+      errorMessage.value = error.response?.data?.error || 'Unable to login. Please try again later.';
+    } else {
+      // If there's no response, it may be a network error or something else
+      console.error('No response received:', error);
+      errorMessage.value = 'Unable to connect to the server. Please try again later.';
+    }
   }
 }
+
 </script>
 
 <style scoped>

@@ -7,16 +7,16 @@ const {
     deleteCaretaker
 } = require('../controllers/caretakerController');
 
-// Create a new caretaker record
+// Create a new caretaker
 router.post('/', createCaretaker);
 
-// Get all caretakers records
+// Get all caretakers
 router.get('/', getAllCaretakers);
 
-// Update a caretaker's details by ID
-router.put('/:ctid', updateCaretaker);
+// Update a caretaker by ID
+router.put('/:caretakerID', updateCaretaker);
 
-// Delete a caretaker's record by ID
-router.delete('/:ctid', deleteCaretaker);
+// Delete a caretaker by ID
+router.delete('/:caretakerID', deleteCaretaker);
 
 module.exports = router;

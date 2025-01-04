@@ -12,20 +12,27 @@ const hospitalRoutes = require('./routes/hospitalRoutes');
 const vaccineRecordRoutes = require('./routes/vaccineRecordRoutes'); // Import the new routes
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:8081', // Allow requests from port 8081
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Specify allowed headers
+}));
+
 app.use(bodyParser.json()); 
 app.use('/api/users', userRoutes);
 app.use('/api/children', childrenRoutes); 
 app.use('/api/vaccine', vaccineRoutes); 
-
-//console.log('/api/physical-records:', physicalRecordRoutes);
-
-
 app.use('/api/physical-records', physicalRecordRoutes); 
 app.use('/api/health-records', healthRecordRoutes); 
 app.use('/api/caretakers', caretakerRoutes); 
 app.use('/api/hospitals', hospitalRoutes);
-//console.log(physicalRecordRoutes); // Should output the router function
+app.use('/api/vaccine-records', vaccineRecordRoutes); // Use the new routes
+
+// Handle 404 errors
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Not Found' });
+});
 
 const PORT = process.env.PORT || 5000;
 

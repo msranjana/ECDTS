@@ -1,84 +1,109 @@
-//import Vue from 'vue';
-import { createRouter, createWebHistory } from 'vue-router'; // Make sure to use these imports from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
-//import VueRouter from 'vue-router';
-import SignUp from '../components/SignUp.vue'; // Adjust path as necessary
+import SignUp from '../components/SignUp.vue';
 import UserLogin from '../components/UserLogin.vue';
 import AdminDashboard from '../components/AdminDashboard.vue';
-
-//Vue.use(VueRouter);
+import ParentDashboard from '../components/ParentDashboard.vue';
+import ManageVaccines from '../components/ManageVaccines.vue';
+import ViewAllChildren from "../components/ViewAllChildren.vue";
+import ManageCaretakers from '../components/ManageCaretakers.vue';
+import ViewAllCaretakers from '../components/ViewAllCaretakers.vue';
+import ViewAllHospitals from '../components/ViewAllHospitals.vue';
+import ManagePhysicalRecords from '../components/ManagePhysicalRecords.vue';
+import ManageHealthRecords from '../components/ManageHealthRecords.vue';
 
 const routes = [
     { path: '/', component: UserLogin, name: 'login' },
     {
-        path: '/signup', // The path where SignUp component will be rendered
+        path: '/signup',
         name: 'SignUp',
         component: SignUp
-      },
+    },
     {
         path: '/admin-dashboard',
         name: 'admin-dashboard',
-        component: AdminDashboard
-      },
-     
-      ];
+        component: AdminDashboard,
+        children: [
+          {
+            path: 'manage-vaccines',
+            component: ManageVaccines,
+          },
+          {
+            path: 'manage-children',
+            component: ViewAllChildren
+          },
+          {
+            path: 'manage-caretakers',
+            component: ManageCaretakers
+          },
+          {
+            path: 'view-caretakers',
+            component: ViewAllCaretakers
+          },
+          {
+            path: 'manage-physical-records',
+            component: ManagePhysicalRecords
+          },
+          {
+            path: 'manage-health-records',
+            component: ManageHealthRecords
+          }
+        ]
+    },
+    { 
+        path: "/admin/manage-children", 
+        component: ViewAllChildren 
+    },
+    {
+        path: '/parent-dashboard',
+        name: 'parent-dashboard',
+        component: ParentDashboard
+    },
+    {
+        path: '/manage-children',
+        name: 'manage-children',
+        component: () => import('../components/ManageChildren.vue'),  // Lazy load
+    },
+    {
+        path: '/admin/manage-vaccines',
+        name: 'manage-vaccines',
+        component: ManageVaccines
+    },
+    {
+        path: '/admin/manage-children',
+        name: 'manage-children',
+        component: ViewAllChildren
+    },
+    {
+        path: '/admin/manage-caretakers',
+        name: 'manage-caretakers',
+        component: ManageCaretakers
+    },
+    {
+        path: '/admin/view-caretakers',
+        name: 'view-caretakers',
+        component: ViewAllCaretakers
+    },
+    {
+      path: '/admin/view-hospitals',
+      name: 'view-hospitals',
+      component: ViewAllHospitals
+  },
+  {
+      path: '/admin/manage-physical-records',
+      name: 'manage-physical-records',
+      component: ManagePhysicalRecords
+  },
+  {
+      path: '/admin/manage-health-records',
+      name: 'manage-health-records',
+      component: ManageHealthRecords
+  },
+];
 
-
-/*const router = new VueRouter({
-    mode: 'history', // Use history mode if you want clean URLs
-    routes,
-});
-*/
 const router = createRouter({
-    history: createWebHistory(), // Ensure you are using createWebHistory() for Vue Router 4.x
-    routes // Your routes array
-  });
+    history: createWebHistory(),
+    routes
+});
 
-  
 export default router;
-
-
-// const express = require('express');
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
-// const User = require('../models/User');
-// const router = express.Router();
-
-// router.post('/signup', async (req, res) => {
-//   const { username, password, role } = req.body;
-
-//   try {
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     const user = new User({ username, password: hashedPassword, role });
-//     await user.save();
-//     res.status(201).json({ success: true, message: 'User registered successfully' });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: 'Signup failed' });
-//   }
-// });
-
-// router.post('/login', async (req, res) => {
-//   const { username, password } = req.body;
-
-//   try {
-//     const user = await User.findOne({ username });
-//     if (!user) {
-//       return res.status(401).json({ success: false, error: 'Invalid credentials' });
-//     }
-
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) {
-//       return res.status(401).json({ success: false, error: 'Invalid credentials' });
-//     }
-
-//     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-//       expiresIn: '1h',
-//     });
-
-//     res.status(200).json({ success: true, user: { id: user._id, username: user.username, role: user.role }, token });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: 'Login failed' });
-//   }
-// });
-
-// module.exports = router;

@@ -1,18 +1,17 @@
 const express = require('express');
-const {
-  createPhysicalRecord,
-  getAllPhysicalRecords,
-  getPhysicalRecordById,
-  updatePhysicalRecord,
-  deletePhysicalRecord,
-} = require('../controllers/physicalRecordController');
-
 const router = express.Router();
+const physicalRecordController = require('../controllers/physicalRecordController');
 
-// Define routes
-router.post('/', createPhysicalRecord);
-router.get('/', getAllPhysicalRecords);
-router.put('/:id', updatePhysicalRecord);
-router.delete('/:id', deletePhysicalRecord);
+// Create a new physical record
+router.post('/', physicalRecordController.createPhysicalRecord);
 
-module.exports = router; // Ensure the router is exported correctly
+// Get all physical records
+router.get('/all', physicalRecordController.getAllPhysicalRecords);
+
+// Update a physical record
+router.put('/:physical_id', physicalRecordController.updatePhysicalRecord);
+
+// Delete a physical record
+router.delete('/:physical_id', physicalRecordController.deletePhysicalRecord);
+
+module.exports = router;

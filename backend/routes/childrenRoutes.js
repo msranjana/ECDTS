@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { createChild, getAllChildren, updateChild, deleteChild } = require('../controllers/childrenController');
+const { getAllChildren, createChild, updateChild, deleteChild, getChildById } = require('../controllers/childrenController'); // Adjust path as necessary
 
+// Routes
+router.get('/all', getAllChildren); // Get all children
 router.post('/', createChild); // Create a new child
-router.get('/', getAllChildren); // Read all children
-router.put('/:child_id', updateChild); // Update a specific child by ID
-router.delete('/:child_id', deleteChild); // Delete a specific child by ID
+router.put('/:childID', updateChild); // Update child by ID
+router.delete('/:childID', deleteChild); // Delete child by ID
+router.get('/:child_id', getChildById); // Get child details by ID
 
 module.exports = router;

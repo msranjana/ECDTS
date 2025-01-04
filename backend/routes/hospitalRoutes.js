@@ -1,22 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {
-    createHospital,
-    getAllHospitals,
-    updateHospital,
-    deleteHospital
-} = require('../controllers/hospitalController');
+const { createHospital, getAllHospitals, updateHospital, deleteHospital } = require('../controllers/hospitalController');  // Ensure path is correct
 
-// Create a new hospital entry
-router.post('/', createHospital);
-
-// Get all hospitals records
-router.get('/', getAllHospitals);
-
-// Update hospital details by ID
-router.put('/:hospitalID', updateHospital);
-
-// Delete hospital by ID
-router.delete('/:hospitalID', deleteHospital);
+// Routes
+router.post('/', createHospital);   // Create a new hospital
+router.get('/', getAllHospitals);   // Get all hospitals
+router.put('/:hospital_id', updateHospital);  // Update hospital by ID
+router.delete('/:hospital_id', deleteHospital); // Delete hospital by ID
 
 module.exports = router;

@@ -1,65 +1,90 @@
-const pool = require('../config/db.config'); // Adjust path as necessary
+const pool = require('../config/db.config');
+
+// Get all children
+const getAllChildren = async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM children");
+        return res.json(rows);
+    } catch (err) {
+        console.error('Error fetching children:', err);
+        return res.sendStatus(500);
+    }
+};
 
 // Create a new child
-async function createChild(req, res) {
-    const { child_name, dob, age, gender, parent_name, parent_contact, address, tracking_end_date } = req.body;
-    try {
-        const [result] = await pool.execute(
-            'INSERT INTO children (child_name, dob, age, gender, parent_name, parent_contact, address) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [child_name, dob, age, gender, parent_name, parent_contact, address, tracking_end_date]
-        );
-        res.status(201).json({ message: 'Child added successfully', id: result.insertId });
-    } catch (error) {
-        console.error('Error adding child:', error);
-        res.status(500).json({ error: 'An error occurred while adding the child.' });
-    }
-}
-
-// Read all children
-async function getAllChildren(req, res) {
-    try {
-        const [rows] = await pool.execute('SELECT * FROM children');
-        res.status(200).json(rows);
-    } catch (error) {
-        console.error('Error fetching children:', error);
-        res.status(500).json({ error: 'An error occurred while fetching children.' });
-    }
-}
-
-// Update a child
-async function updateChild(req, res) {
-    const { id } = req.params;
+const createChild = async (req, res) => {
     const { child_name, dob, age, gender, parent_name, parent_contact, address } = req.body;
+
     try {
-        const [result] = await pool.execute(
-            'UPDATE children SET child_name = ?, dob = ?, age = ?, gender = ?, parent_name = ?, parent_contact = ?, address = ? WHERE child_id = ?',
-            [child_name, dob, age, gender, parent_name, parent_contact, address, id]
+        const [result] = await pool.query(
+            "INSERT INTO children (child_name, dob, age, gender, parent_name, parent_contact, address) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [child_name, dob, age, gender, parent_name, parent_contact, address]
         );
-        if (result.affectedRows > 0) {
-            res.status(200).json({ message: 'Child updated successfully' });
-        } else {
-            res.status(404).json({ error: 'Child not found' });
-        }
-    } catch (error) {
-        console.error('Error updating child:', error);
-        res.status(500).json({ error: 'An error occurred while updating the child.' });
+        return res.status(201).json({ message: 'Child added successfully', id: result.insertId });
+    } catch (err) {
+        console.error('Error adding child:', err);
+        return res.sendStatus(500);
     }
-}
+};
 
-// Delete a child
-async function deleteChild(req, res) {
-    const { id } = req.params;
+// Update child details by ID
+const updateChild = async (req, res) => {
+    const { childID } = req.params;
+    const { child_name, dob, age, gender, parent_name, parent_contact, address } = req.body;
+
     try {
-        const [result] = await pool.execute('DELETE FROM children WHERE child_id = ?', [id]);
-        if (result.affectedRows > 0) {
-            res.status(200).json({ message: 'Child deleted successfully' });
-        } else {
-            res.status(404).json({ error: 'Child not found' });
-        }
-    } catch (error) {
-        console.error('Error deleting child:', error);
-        res.status(500).json({ error: 'An error occurred while deleting the child.' });
+        const formattedDob = new Date(dob).toISOString().split('T')[0]; // Format the date to 'YYYY-MM-DD'
+        const [result] = await pool.query(
+            "UPDATE children SET child_name = ?, dob = ?, age = ?, gender = ?, parent_name = ?, parent_contact = ?, address = ? WHERE child_id = ?",
+            [child_name, formattedDob, age, gender, parent_name, parent_contact, address, childID]
+        );
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.json({ message: 'Child updated successfully' });
+    } catch (err) {
+        console.error('Error updating child:', err);
+        return res.sendStatus(500);
     }
-}
+};
 
-module.exports = { createChild, getAllChildren, updateChild, deleteChild };
+// Delete child by ID
+const deleteChild = async (req, res) => {
+    const { childID } = req.params;
+
+    try {
+        const [result] = await pool.query(
+            "DELETE FROM children WHERE child_id = ?",
+            [childID]
+        );
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.json({ message: 'Child deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting child:', err);
+        return res.sendStatus(500);
+    }
+};
+
+// Get child by ID
+const getChildById = async (req, res) => {
+    const { child_id } = req.params;
+  
+    try {
+      const [rows] = await pool.execute('SELECT * FROM children WHERE child_id = ?', [child_id]);
+  
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Child not found' });
+      }
+  
+      res.json(rows[0]);
+    } catch (error) {
+      console.error('Error fetching child details:', error);
+      res.status(500).json({ error: 'An error occurred while fetching child details.' });
+    }
+  };
+
+module.exports = {
+    getAllChildren,
+    createChild,
+    updateChild,
+    deleteChild,
+    getChildById
+};

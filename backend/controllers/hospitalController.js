@@ -1,71 +1,67 @@
-const pool=require('../config/db.config');
+const pool = require('../config/db.config');
 
-// Create a new hospital entry
-const createHospital=async(req,res)=>{
-     let{hospital_name}=req.body; // Extract hospital name from request body.
+// Create a new hospital
+const createHospital = async (req, res) => {
+    const { hospital_name, location, hospital_contact } = req.body;
 
-     try{
-         let[result]=await pool.query("INSERT INTO hospital(hospital_name) VALUES(?)", 
-             hospital_name 
-         );
-
-         return(res.send(`Hospital ${hospital_name} added successfully.`)); // Success message.
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+    try {
+        const [result] = await pool.query(
+            "INSERT INTO hospital (hospital_name, location, hospital_contact) VALUES (?, ?, ?)",
+            [hospital_name, location, hospital_contact]
+        );
+        return res.send(`Hospital ${hospital_name} added successfully.`);
+    } catch (err) {
+        console.error('Error creating hospital:', err);
+        return res.sendStatus(500);
+    }
 };
 
 // Get all hospitals
-const getAllHospitals=async(req,res)=>{
-     try{
-         let[rows]=await pool.query("SELECT * FROM hospital"); // Fetch all hospitals from database.
-         
-         return(res.json(rows)); // Return fetched rows as JSON response.
-     }catch(err){
-         console.error(err); // Log any errors.
-         return(res.sendStatus(500)); // Respond with internal server status.
-     }
+const getAllHospitals = async (req, res) => {
+    try {
+        const [rows] = await pool.query("SELECT * FROM hospital");
+        return res.json(rows);
+    } catch (err) {
+        console.error('Error fetching hospitals:', err);
+        return res.sendStatus(500);
+    }
 };
 
-// Update hospital details by ID
-const updateHospital=async(req,res)=>{
-     let{hospital_name}=req.body; 
-     let{hospitalID}=req.params; 
+// Update hospital by ID
+const updateHospital = async (req, res) => {
+    const { hospital_name, location, hospital_contact } = req.body;
+    const { hospital_id } = req.params;
 
-     try{
-         let[result]=await pool.query("UPDATE hospital SET hospital_name=? WHERE hospitalID=?", 
-             [hospital_name], 
-             [hospitalID]
-         );
-
-         if(result.affectedRows===0)
-             return(res.sendStatus(404)); 
-
-         return(res.send(`Hospital ${hospitalID} updated successfully.`));
-     }catch(err){
-         console.error(err); 
-         return(res.sendStatus(500));
-     }
+    try {
+        const [result] = await pool.query(
+            "UPDATE hospital SET hospital_name = ?, location = ?, hospital_contact = ? WHERE hospital_id = ?",
+            [hospital_name, location, hospital_contact, hospital_id]
+        );
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.send(`Hospital ${hospital_id} updated successfully.`);
+    } catch (err) {
+        console.error('Error updating hospital:', err);
+        return res.sendStatus(500);
+    }
 };
 
 // Delete hospital by ID
-const deleteHospital=async(req,res)=>{
-     let{hospitalID}=req.params; 
+const deleteHospital = async (req, res) => {
+    const { hospital_id } = req.params;
 
-     try{
-         let[result]=await pool.query("DELETE FROM hospital WHERE hospitalID=?", 
-             hospitalID 
-         );
-
-         if(result.affectedRows===0)
-             return(res.sendStatus(404));
-
-         return(res.send(`Hospital ${hospitalID} deleted successfully.`));
-     }catch(err){
-         console.error(err); 
-         return(res.sendStatus(500));
-     }
+    try {
+        const [result] = await pool.query("DELETE FROM hospital WHERE hospital_id = ?", [hospital_id]);
+        if (result.affectedRows === 0) return res.sendStatus(404);
+        return res.send(`Hospital ${hospital_id} deleted successfully.`);
+    } catch (err) {
+        console.error('Error deleting hospital:', err);
+        return res.sendStatus(500);
+    }
 };
 
-module.exports={createHospital,getAllHospitals ,updateHospital ,deleteHospital};
+module.exports = {
+    createHospital,
+    getAllHospitals,
+    updateHospital,
+    deleteHospital
+};
