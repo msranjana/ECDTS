@@ -15,15 +15,15 @@
       <h2><strong>Manage Vaccine Records</strong></h2>
 
       <!-- Form to add or update a vaccine record -->
-      <form @submit.prevent="editingRecord ? updateVaccineRecord() : addVaccineRecord()">
+      <form @submit.prevent="validateAndSubmit">
         <input v-model="newRecord.v_id" placeholder="Vaccine ID" required />
         <input v-model="newRecord.child_id" placeholder="Child ID" required />
-        <input v-model="newRecord.administered_date" type="date" placeholder="Administered Date" required />
-        <input v-model="newRecord.next_due_date" type="date" placeholder="Next Due Date" required />
-        <!-- Status field is read-only and automatically managed by the backend -->
-        <input v-model="newRecord.status" placeholder="Status" readonly />
+        <input v-model="newRecord.administered_date" type="date" placeholder="Administered Date" required :readonly="editingRecord !== null" />
+        <input v-model="newRecord.next_due_date" type="date" placeholder="Next Due Date" />
         <button type="submit">{{ editingRecord ? 'Update Record' : 'Add Record' }}</button>
       </form>
+
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
       <table>
         <thead>
@@ -33,7 +33,6 @@
             <th>Child ID</th>
             <th>Administered Date</th>
             <th>Next Due Date</th>
-            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -44,14 +43,13 @@
             <td>{{ record.child_id }}</td>
             <td>{{ record.administered_date }}</td>
             <td>{{ record.next_due_date }}</td>
-            <td>{{ record.status }}</td>
             <td>
               <button @click="editVaccineRecord(record)">Edit</button>
               <button @click="deleteVaccineRecord(record.vrec_id)">Delete</button>
             </td>
           </tr>
           <tr v-if="vaccineRecords.length === 0">
-            <td colspan="7" class="no-data">No data available</td>
+            <td colspan="6" class="no-data">No data available</td>
           </tr>
         </tbody>
       </table>
@@ -76,10 +74,10 @@ export default {
         v_id: '',
         child_id: '',
         administered_date: '',
-        next_due_date: '',
-        status: '' // Add status field
+        next_due_date: ''
       },
-      editingRecord: null
+      editingRecord: null,
+      errorMessage: '' // Add error message property
     };
   },
   methods: {
@@ -93,12 +91,22 @@ export default {
     },
     async addVaccineRecord() {
       try {
-        const response = await axios.post('http://localhost:5000/api/vaccine-records', this.newRecord);
+        const recordToAdd = {
+          v_id: this.newRecord.v_id,
+          child_id: this.newRecord.child_id,
+          administered_date: this.newRecord.administered_date,
+          next_due_date: this.newRecord.next_due_date || null // Ensure next_due_date is either a valid date or null
+        };
+        const response = await axios.post('http://localhost:5000/api/vaccine-records', recordToAdd);
         console.log('Vaccine record added:', response.data);
         this.fetchVaccineRecords();
         this.clearForm();
       } catch (error) {
-        console.error('Error adding vaccine record:', error);
+        if (error.response && error.response.data && error.response.data.error) {
+          this.errorMessage = error.response.data.error;
+        } else {
+          console.error('Error adding vaccine record:', error);
+        }
       }
     },
     editVaccineRecord(record) {
@@ -130,12 +138,27 @@ export default {
         v_id: '',
         child_id: '',
         administered_date: '',
-        next_due_date: '',
-        status: '' // Clear status field
+        next_due_date: ''
       };
+      this.errorMessage = ''; // Clear error message
     },
     goToDashboard() {
       this.$router.push('/admin-dashboard');
+    },
+    validateAndSubmit() {
+      const administeredDate = new Date(this.newRecord.administered_date);
+      const nextDueDate = this.newRecord.next_due_date ? new Date(this.newRecord.next_due_date) : null;
+
+      if (nextDueDate && administeredDate >= nextDueDate) {
+        alert('Administered Date must be earlier than Next Due Date.');
+        return;
+      }
+
+      if (this.editingRecord) {
+        this.updateVaccineRecord();
+      } else {
+        this.addVaccineRecord();
+      }
     }
   },
   mounted() {
@@ -334,5 +357,10 @@ button {
 button:hover {
   background-color: #ffc107; /* Updated color */
   color: #fff;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
 }
 </style>

@@ -12,9 +12,10 @@ import ViewAllHospitals from '../components/ViewAllHospitals.vue';
 import ManagePhysicalRecords from '../components/ManagePhysicalRecords.vue';
 import ManageHealthRecords from '../components/ManageHealthRecords.vue';
 import ManageVaccineRecords from '../components/VaccineRecords.vue';
+import HomePage from '../components/HomePage.vue';
 
 const routes = [
-    { path: '/', component: UserLogin, name: 'login' },
+    { path: '/', component: HomePage, name: 'Home' },
     {
         path: '/login',
         name: 'login',
@@ -63,7 +64,7 @@ const routes = [
     },
     {
         path: '/parent-dashboard',
-        name: 'parent-dashboard',
+        name: 'ParentDashboard',
         component: ParentDashboard
     },
     {

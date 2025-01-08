@@ -2,7 +2,7 @@ const pool = require('../config/db.config');
 
 // Create a new vaccine record
 const createVaccineRecord = async (req, res) => {
-    const { v_id, child_id, administered_date, next_due_date, status } = req.body;
+    const { v_id, child_id, administered_date, next_due_date } = req.body;
 
     try {
         // Check if the referenced records exist
@@ -19,13 +19,13 @@ const createVaccineRecord = async (req, res) => {
 
         // Insert the new vaccine record
         const [result] = await pool.execute(
-            'INSERT INTO vaccine_record (v_id, child_id, administered_date, next_due_date, status) VALUES (?, ?, ?, ?, ?)',
-            [v_id, child_id, administered_date, next_due_date, status]
+            'INSERT INTO vaccine_record (v_id, child_id, administered_date, next_due_date) VALUES (?, ?, ?, ?)',
+            [v_id, child_id, administered_date, next_due_date || null]
         );
         res.status(201).json({ message: 'Vaccine record added successfully', id: result.insertId });
     } catch (error) {
         console.error('Error adding vaccine record:', error);
-        res.status(500).json({ error: 'An error occurred while adding the vaccine record.', details: error.message || error });
+        res.status(500).json({ error: 'An error occurred while adding the vaccine record [duplicate vaccine record not allowed].', details: error.message || error });
     }
 };
 
@@ -43,12 +43,12 @@ const getAllVaccineRecords = async (req, res) => {
 // Update a vaccine record
 const updateVaccineRecord = async (req, res) => {
     const { vrec_id } = req.params;
-    const { v_id, child_id, administered_date, next_due_date, status } = req.body;
+    const { v_id, child_id, administered_date, next_due_date } = req.body;
 
     try {
         const [result] = await pool.execute(
-            'UPDATE vaccine_record SET v_id=?, child_id=?, administered_date=?, next_due_date=?, status=? WHERE vrec_id=?',
-            [v_id, child_id, administered_date, next_due_date, status, vrec_id]
+            'UPDATE vaccine_record SET v_id=?, child_id=?, administered_date=?, next_due_date=? WHERE vrec_id=?',
+            [v_id, child_id, administered_date, next_due_date, vrec_id]
         );
 
         if (result.affectedRows === 0) return res.status(404).json({ error: 'Vaccine record not found' });

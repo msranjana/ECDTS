@@ -5,12 +5,15 @@
       <div class="header-container">
         <h1>EarlyCare - An Early Child Development Tracking System</h1>
       </div>
+      <div class="profile-menu">
+          <button class="profile-button" @click="goToDashboard">Logout</button>
+        </div>
     </header>
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <nav class="sidebar-nav">
-        <h2>Admin Dashboard</h2>
+        <h2>ADMIN DASHBOARD</h2>
         <router-link to="/admin/manage-vaccines" class="nav-link">Manage Vaccines</router-link>
         <router-link to="/admin/manage-children" class="nav-link">Manage Children</router-link>
         <router-link to="/admin/manage-physical-records" class="nav-link">Manage Physical Records</router-link>
@@ -23,7 +26,7 @@
 
     <!-- Main Content Area -->
     <main class="dashboard-content">
-      <h2 class="summary-title">Short Summary Card</h2>
+      <h2 class="summary-title">Overview Section</h2>
       <div class="summary-card">
         <div class="summary-item">
           <h3>Total Children Registered</h3>
@@ -34,12 +37,8 @@
           <p>{{ caretakers.length }}</p>
         </div>
         <div class="summary-item">
-          <h3>Average BMI</h3>
-          <p>{{ averageBMI }}</p>
-        </div>
-        <div class="summary-item">
-          <h3>Total Health Records</h3>
-          <p>{{ healthRecords.length }}</p>
+          <h3>Total Hospitals</h3>
+          <p>{{ hospitals.length }}</p>
         </div>
       </div>
 
@@ -73,9 +72,9 @@ const caretakers = ref([]);
 const healthRecords = ref([]);
 const vaccinationsAdministered = ref(0);
 const vaccinationsPending = ref(0);
-const averageBMI = ref(0);
 const boysCount = ref(0);
 const girlsCount = ref(0);
+const hospitals = ref([]);
 
 // Fetch data from the backend when the component is mounted
 onMounted(async () => {
@@ -94,17 +93,8 @@ onMounted(async () => {
     vaccinationsAdministered.value = vaccinations.filter(v => v.status === 'administered').length;
     vaccinationsPending.value = vaccinations.filter(v => v.status === 'pending').length;
 
-    if (healthRecords.value.length > 0) {
-      const totalBMI = healthRecords.value.reduce((sum, record) => {
-        const bmi = parseFloat(record.bmi);
-        console.log(`BMI Value: ${bmi}`); // Debugging information
-        return sum + (isNaN(bmi) ? 0 : bmi);
-      }, 0);
-      averageBMI.value = (totalBMI / healthRecords.value.length).toFixed(2);
-      console.log(`Total BMI: ${totalBMI}, Average BMI: ${averageBMI.value}`); // Debugging information
-    } else {
-      averageBMI.value = 'N/A';
-    }
+    const hospitalResponse = await axios.get('http://localhost:5000/api/hospitals');
+    hospitals.value = hospitalResponse.data;
 
     boysCount.value = children.value.filter(child => child.gender.toLowerCase() === 'male').length;
     girlsCount.value = children.value.filter(child => child.gender.toLowerCase() === 'female').length;
@@ -150,6 +140,11 @@ onMounted(async () => {
     console.error('Error fetching data:', error);
   }
 });
+
+
+const goToDashboard = () => {
+  window.location.href = '/login';
+};
 </script>
 
 <style scoped>
@@ -167,7 +162,7 @@ onMounted(async () => {
   top: 0;
   left: 0;
   width: 100%;
-  height: 60px;
+  height: 50px;
   background-color: #26a69a;
   color: #fff;
   display: flex;
@@ -287,7 +282,7 @@ onMounted(async () => {
   background-color: #26a69a;
   color: #fff;
   text-align: center;
-  padding: 10px 20px; /* Add some padding for better spacing */
+  padding: 5px 10px; /* Add some padding for better spacing */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
   z-index: 1000; /* Ensure it stays above other elements */
 }
@@ -362,5 +357,29 @@ onMounted(async () => {
   margin-bottom: 10px;
   font-size: 1.5rem;
   color: #26a69a;
+}
+
+/* Summary Cards */
+.summary-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  flex: 1;
+  min-width: 220px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.summary-item:hover {
+  transform: scale(1.05);
 }
 </style>

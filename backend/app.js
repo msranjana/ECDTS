@@ -9,7 +9,7 @@ const childrenRoutes = require('./routes/childrenRoutes'); // Ensure this is imp
 const healthRecordRoutes = require('./routes/healthRecordRoutes'); // Add this line
 const vaccineRecordRoutes = require('./routes/vaccineRecordRoutes');
 const userRoutes = require('./routes/userRoutes');
-const parentRoutes = require('./routes/parentRoutes'); // Ensure this is imported
+const parentRoutes = require('./routes/parent'); // Update the path to the new location
 
 const app = express();
 
@@ -17,10 +17,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using HTTPS
 }));
 
 // Register routes
@@ -34,7 +34,7 @@ app.use('/api/parent', parentRoutes); // Ensure this is registered
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;

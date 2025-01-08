@@ -1,9 +1,18 @@
 <template>
+  <header class="dashboard-header">
+      <div class="header-container">
+        <h1>EarlyCare - An Early Child Development Tracking System</h1>
+      </div>
+      <div class="profile-menu">
+          <button class="back-to-dashboard" @click="goToDashboard">Back to Homepage</button> <!-- Add this line -->
+          
+        </div>
+    </header>
   <v-container>
     <v-row justify="center" align="center" style="height: 100vh;">
       <v-col cols="12" md="4">
         <v-card>
-          <v-card-title class="headline">Login</v-card-title>
+          <v-card-title class="headline">Login Page</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid">
               <v-text-field
@@ -33,6 +42,9 @@
       </v-col>
     </v-row>
   </v-container>
+  <footer class="dashboard-footer">
+      <p>&copy; 2025 EarlyCare. All rights reserved.</p>
+    </footer>
 </template>
 
 <script setup>
@@ -83,7 +95,7 @@ async function login() {
         await router.push({ name: 'admin-dashboard' }); // Use the named route
       } else if (role === 'parent') {
         console.log("Redirecting to parent-dashboard");
-        await router.push({ name: 'parent-dashboard' }); // Use the named route
+        window.location.href = 'http://localhost:8081/parent-dashboard'; // Redirect to specific URL
       } else {
         await router.push('/user-dashboard'); // Use relative path as fallback
       }
@@ -100,7 +112,7 @@ async function login() {
     } else {
       // If there's no response, it may be a network error or something else
       console.error('No response received:', error);
-      errorMessage.value = 'Unable to connect to the server. Please try again later.';
+      //errorMessage.value = 'Unable to connect to the server. Please try again later.';
     }
   }
 }
@@ -109,9 +121,60 @@ const switchToSignUp = () => {
   router.push({ name: 'signup' });
 };
 
+const goToDashboard = () => {
+  window.location.href = '/'; // Add this function
+};
 </script>
 
 <style scoped>
 /* Add any additional styles here */
+
+/* Header Styling */
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #26a69a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+/* Footer Styling */
+.dashboard-footer {
+  position: fixed; /* Make the footer fixed */
+  bottom: 0;       /* Stick to the bottom */
+  left: 0;         /* Align with the viewport's left */
+  width: 100%;     /* Stretch across the entire width */
+  background-color: #26a69a;
+  color: #fff;
+  text-align: center;
+  padding: 10px 20px; /* Add some padding for better spacing */
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
+  z-index: 1000; /* Ensure it stays above other elements */
+}
+.profile-menu {
+  position: relative;
+}
+
+.profile-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+}
 </style>
 

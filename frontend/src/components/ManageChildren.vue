@@ -5,11 +5,8 @@
       <div class="header-container">
         <h1>EarlyCare</h1>
         <div class="profile-menu">
-          <button class="profile-button">Admin ▼</button>
-          <ul class="dropdown-menu">
-            <li><a href="#profile">Profile</a></li>
-            <li><a href="#logout">Logout</a></li>
-          </ul>
+          <button class="profile-button">Admin </button>
+        
         </div>
       </div>
     </header>
